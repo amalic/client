@@ -175,7 +175,7 @@ helpers.rootLinuxNode(env, {
     stage("Test") {
       withKbweb() {
         parallel (
-          failFast: true
+          failFast: true,
           test_linux: {
             def packagesToTest = [:]
             if (hasGoChanges) {
