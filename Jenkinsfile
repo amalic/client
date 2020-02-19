@@ -460,7 +460,7 @@ def testGoBuilds(prefix, packagesToTest) {
   // Check protocol diffs
   // Clean the index first
   dir ('..') {
-    sh "git add -A"
+    // sh "git add -A"
     // Generate protocols
     dir ('protocol') {
       sh "yarn --frozen-lockfile"
