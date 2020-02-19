@@ -459,14 +459,16 @@ def testGo(prefix, packagesToTest) {
 def testGoBuilds(prefix, packagesToTest) {
   // Check protocol diffs
   // Clean the index first
-  sh "git add -A"
-  // Generate protocols
-  dir ('protocol') {
-    sh "yarn --frozen-lockfile"
-    sh "make clean"
-    sh "make"
+  dir ('..') {
+    sh "git add -A"
+    // Generate protocols
+    dir ('protocol') {
+      sh "yarn --frozen-lockfile"
+      sh "make clean"
+      sh "make"
+    }
+    checkDiffs(['./go/', './protocol/'], 'Please run \\"make\\" inside the client/protocol directory.')
   }
-  checkDiffs(['./go/', './protocol/'], 'Please run \\"make\\" inside the client/protocol directory.')
 
   if (prefix == "test_linux_go_") {
     dir("keybase") {
