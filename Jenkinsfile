@@ -177,18 +177,6 @@ helpers.rootLinuxNode(env, {
         parallel (
           failFast: true
           test_linux: {
-            if (hasGoChanges) {
-              // Check protocol diffs
-              // Clean the index first
-              sh "git add -A"
-              // Generate protocols
-              dir ('protocol') {
-                sh "yarn --frozen-lockfile"
-                sh "make clean"
-                sh "make"
-              }
-              checkDiffs(['./go/', './protocol/'], 'Please run \\"make\\" inside the client/protocol directory.')
-            }
             def packagesToTest = [:]
             if (hasGoChanges) {
               packagesToTest = getPackagesToTest(dependencyFiles)
@@ -220,12 +208,6 @@ helpers.rootLinuxNode(env, {
                 "GPG=/usr/bin/gpg.distrib",
               ]) {
                 if (hasGoChanges) {
-                  dir("go/keybase") {
-                    sh "go build -ldflags \"-s -w\" -buildmode=pie --tags=production"
-                  }
-                  dir("go/fuzz") {
-                    sh "go build -tags gofuzz ./..."
-                  }
                   testGo("test_linux_go_", packagesToTest)
                 }
               }},
@@ -309,12 +291,6 @@ helpers.rootLinuxNode(env, {
                   println "Test Windows"
                   parallel (
                     test_windows_go: {
-                      // TODO: if we re-enable tests
-                      // other than Go tests on Windows,
-                      // add a `hasGoChanges` check here.
-                      dir("go/keybase") {
-                        bat "go build -ldflags \"-s -w\" --tags=production"
-                      }
                       testGo("test_windows_go_", getPackagesToTest(dependencyFiles))
                     }
                   )
@@ -481,6 +457,30 @@ def testGo(prefix, packagesToTest) {
 }
 
 def testGoBuilds(prefix, packagesToTest) {
+  // Check protocol diffs
+  // Clean the index first
+  sh "git add -A"
+  // Generate protocols
+  dir ('protocol') {
+    sh "yarn --frozen-lockfile"
+    sh "make clean"
+    sh "make"
+  }
+  checkDiffs(['./go/', './protocol/'], 'Please run \\"make\\" inside the client/protocol directory.')
+
+  if (prefix == "test_linux_go_") {
+    dir("keybase") {
+      sh "go build -ldflags \"-s -w\" -buildmode=pie --tags=production"
+    }
+    dir("fuzz") {
+      sh "go build -tags gofuzz ./..."
+    }
+  } else if (prefix == "test_windows_go_") {
+    dir("keybase") {
+      sh "go build -ldflags \"-s -w\" --tags=production"
+    }
+  }
+
   println "Running golint"
   retry(5) {
     sh 'go get -u golang.org/x/lint/golint'
