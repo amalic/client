@@ -572,7 +572,12 @@ def testGo(prefix, packagesToTest) {
 
     def tests = [:]
     def specialTests = [:]
-    def specialTestFilter = ['chat', 'engine', 'teams', 'chat_storage', 'systests', 'kbfs_libdokan']
+    def specialTestFilter = [
+        'chat', 'engine', 'teams', 'chat_storage', 'systests', 'kbfs_libdokan',
+        'kbfs_test_race', 'stellar_stellarsvc', 'tlfupgrade', 'service',
+        'saltpackkeys', 'kbfs_libkbfs', 'kbfs_test', 'identify3', 'git',
+        'ephemeral'
+    ]
     def testSpecMap = [
       test_macos_go_: [
         'github.com/keybase/client/go/kbfs/test': [
