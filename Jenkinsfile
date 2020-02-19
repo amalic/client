@@ -779,10 +779,12 @@ def testGoTestSuite(prefix, packagesToTest) {
     }
 
     def testBinary = "${testSpec.name}.test"
+    dir(testSpec.dirPath) {
+      sh "go test -i"
+    }
     def test = {
       println "Building tests for ${testSpec.dirPath}"
       dir(testSpec.dirPath) {
-        sh "go test -i"
         sh "go test -c ${testSpec.flags} -o ${testBinary}"
         // Only run the test if a test binary should have been produced.
         if (fileExists(testBinary)) {
